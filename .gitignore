@@ -1,10 +1,12 @@
 HELP.md
 .gradle
 build/
+gradle/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 src/main/resources/config.properties
+air_alert_inspector_bot
 
 ### STS ###
 .apt_generated

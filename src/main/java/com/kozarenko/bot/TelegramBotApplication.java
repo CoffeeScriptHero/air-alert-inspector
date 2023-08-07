@@ -14,8 +14,8 @@ public class TelegramBotApplication {
       TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
       TestBot bot = new TestBot(
               configManager.getProperty(AppConstants.BOT_TOKEN_FIELD),
-              AppConstants.BOT_USERNAME,
-              Long.parseLong(configManager.getProperty(AppConstants.BOT_ID_FIELD)));
+              AppConstants.BOT_USERNAME
+      );
       botsApi.registerBot(bot);
     } catch (Exception ex) {
       ex.printStackTrace();
