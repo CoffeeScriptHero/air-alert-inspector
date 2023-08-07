@@ -10,7 +10,7 @@ public class ConfigManager {
     private final Properties properties;
 
     private ConfigManager() throws IOException {
-        try (FileInputStream fis = new FileInputStream(AppConstants.CONFIG_FILE_PATH)) {
+        try (FileInputStream fis = new FileInputStream(Constants.CONFIG_FILE_PATH)) {
             properties = new Properties();
             properties.load(fis);
         }
