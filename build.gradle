@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-	implementation group: 'org.telegram', name: 'telegrambots-spring-boot-starter', version: '6.7.0'
+	implementation 'org.telegram:telegrambots-spring-boot-starter:6.7.0'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.telegram:telegrambots:6.7.0'
 	implementation 'org.telegram:telegrambots-abilities:6.7.0'

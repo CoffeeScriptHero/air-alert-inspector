@@ -5,7 +5,7 @@ gradle/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-src/main/resources/config.properties
+src/main/resources/application.yml
 air_alert_inspector_bot
 
 ### STS ###

@@ -25,23 +25,31 @@ public class AirAlertBot extends TelegramLongPollingBot {
   @Value("${bot.username}")
   private String username;
 
+  @Value("${bot.id}")
+  private Long id;
+
   @Override
   public void onUpdateReceived(Update update) {
-    if (update.hasMessage() && update.getMessage().hasText()) {
+    if (update.hasMessage()) {
       Message message = update.getMessage();
 
-      switch (message.getText()) {
-        case "/start":
-          onStart(message.getChat());
-          break;
-        default:
-          try {
-            execute(SendMessage.builder().text("Wow!").chatId(message.getChatId()).build());
-          } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-          }
+      if (botAddedToGroup(message)) {
+        return;
       }
 
+      if (update.getMessage().hasText()) {
+        switch (message.getText()) {
+          case "/start":
+            onStart(message.getChat());
+            break;
+          default:
+            try {
+              execute(SendMessage.builder().text("Wow!").chatId(message.getChatId()).build());
+            } catch (TelegramApiException e) {
+              throw new RuntimeException(e);
+            }
+        }
+      }
     } else if (update.hasCallbackQuery()) {
       onCallback(update.getCallbackQuery());
     }
@@ -50,6 +58,15 @@ public class AirAlertBot extends TelegramLongPollingBot {
   @Override
   public String getBotUsername() {
     return username;
+  }
+
+  @Override
+  public String getBotToken() {
+    return token;
+  }
+
+  public Long getId() {
+    return id;
   }
 
   public void onStart(Chat chat) {
@@ -69,6 +86,16 @@ public class AirAlertBot extends TelegramLongPollingBot {
     } catch (TelegramApiException ex) {
       ex.printStackTrace();
     }
+  }
+
+  private boolean botAddedToGroup(Message message) {
+    if (message.getNewChatMembers() != null && message.getNewChatMembers().size() > 0) {
+      if (message.getNewChatMembers().stream().anyMatch(u -> u.getId().equals(getId()))) {
+        onStart(message.getChat());
+        return true;
+      }
+    }
+    return false;
   }
 
   private InlineKeyboardMarkup buildMenu() {
