@@ -1,23 +1,25 @@
 package com.kozarenko.bot;
 
+import com.kozarenko.bot.service.RestService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import javax.security.auth.callback.Callback;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class AirAlertBot extends TelegramLongPollingBot {
+
+  private RestService restService;
 
   @Value("${bot.token}")
   private String token;
@@ -27,6 +29,10 @@ public class AirAlertBot extends TelegramLongPollingBot {
 
   @Value("${bot.id}")
   private Long id;
+
+  public AirAlertBot(RestService restService) {
+    this.restService = restService;
+  }
 
   @Override
   public void onUpdateReceived(Update update) {
@@ -120,20 +126,26 @@ public class AirAlertBot extends TelegramLongPollingBot {
   }
 
   public void onCallback(CallbackQuery callbackQuery) {
-
     switch (callbackQuery.getData()) {
       case "map":
-
+        try {
+          execute(SendPhoto.builder()
+                  .photo(new InputFile("https://alerts.com.ua/map.png"))
+                  .chatId(callbackQuery.getMessage().getChatId())
+                  .build());
+        } catch (TelegramApiException ex) {
+          ex.printStackTrace();
+        }
     }
-
-    AnswerCallbackQuery answer = new AnswerCallbackQuery();
-    answer.setCallbackQueryId(callbackQuery.getId());
-    answer.setText(callbackQuery.getData());
-
-    try {
-      execute(answer);
-    } catch (TelegramApiException e) {
-      throw new RuntimeException(e);
-    }
+//
+//    AnswerCallbackQuery answer = new AnswerCallbackQuery();
+//    answer.setCallbackQueryId(callbackQuery.getId());
+//    answer.setText(callbackQuery.getData());
+//
+//    try {
+//      execute(answer);
+//    } catch (TelegramApiException e) {
+//      throw new RuntimeException(e);
+//    }
   }
 }
