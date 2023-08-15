@@ -17,8 +17,9 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.telegram:telegrambots-spring-boot-starter:6.7.0'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.telegram:telegrambots-spring-boot-starter:6.7.0'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.telegram:telegrambots:6.7.0'
 	implementation 'org.telegram:telegrambots-abilities:6.7.0'
 	compileOnly 'org.projectlombok:lombok:1.18.28'
