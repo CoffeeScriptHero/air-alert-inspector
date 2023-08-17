@@ -2,6 +2,8 @@ package com.kozarenko.bot.model;
 
 public class State {
 
+  private static final String KYIV = "м. Київ";
+
   private String name;
   private int id;
 
@@ -26,6 +28,14 @@ public class State {
 
   public void setId(int id) {
     this.id = id;
+  }
+
+  public String getNameOfState() {
+    String space = " ";
+    if (!name.equals(KYIV) && name.contains(space)) {
+      return name.substring(0, name.indexOf(space));
+    }
+    return name;
   }
 
   @Override

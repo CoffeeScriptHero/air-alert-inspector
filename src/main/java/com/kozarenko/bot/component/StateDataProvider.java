@@ -1,21 +1,27 @@
-package com.kozarenko.bot.service;
+package com.kozarenko.bot.component;
 
 import com.kozarenko.bot.model.State;
-import org.springframework.stereotype.Service;
+import com.kozarenko.bot.service.RestService;
+import jakarta.annotation.PostConstruct;
+import org.springframework.stereotype.Component;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-@Service
-public class StateService {
+@Component
+public class StateDataProvider {
 
   private List<State> states;
   private final RestService restService;
 
-  public StateService(RestService restService) {
+  public StateDataProvider(RestService restService) {
     this.restService = restService;
+  }
 
+  @PostConstruct
+  private void postConstruct() {
     try {
       this.states = restService.getStates();
     } catch (URISyntaxException ex) {
@@ -25,7 +31,7 @@ public class StateService {
   }
 
   public List<State> getStates() {
-    return states;
+    return Collections.unmodifiableList(states);
   }
 
   private List<State> getDefaultStates() {
