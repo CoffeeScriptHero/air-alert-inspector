@@ -1,11 +1,13 @@
 package com.kozarenko.bot.model;
 
-public class Region {
+public class State {
 
   private String name;
   private int id;
 
-  public Region(String name, int id) {
+  public State() {}
+
+  public State(String name, int id) {
     this.name = name;
     this.id = id;
   }
@@ -24,5 +26,10 @@ public class Region {
 
   public void setId(int id) {
     this.id = id;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("State{name='%s', id=%d}", name, id);
   }
 }

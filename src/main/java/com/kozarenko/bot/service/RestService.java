@@ -1,5 +1,7 @@
 package com.kozarenko.bot.service;
 
+import com.kozarenko.bot.mapper.StateMapper;
+import com.kozarenko.bot.model.State;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpHeaders;
@@ -30,25 +32,33 @@ public class RestService {
     this.restTemplate = restTemplateBuilder.build();
   }
 
-  private RequestEntity<Void> createRequestEntity(String url) throws URISyntaxException {
+  private RequestEntity<Void> createRequestEntity(String path) throws URISyntaxException {
     HttpHeaders headers = new HttpHeaders();
     headers.set(API_KEY_HEADER, apiKey);
 
-    return RequestEntity.get(new URI(url))
+    return RequestEntity.get(new URI(BASE_API_URL + path))
         .headers(headers)
         .build();
   }
 
-  public List<String> getStates() throws URISyntaxException {
+  public List<State> getStates() throws URISyntaxException {
+    StateMapper stateMapper = new StateMapper();
+
     ResponseEntity<String> response =
-        restTemplate.exchange(createRequestEntity(BASE_API_URL + STATES), String.class);
+        restTemplate.exchange(createRequestEntity(STATES), String.class);
+
+    try {
+      return stateMapper.statesFromJson(response.getBody());
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
 
     return List.of();
   }
 
   public void getAirAlertHistory() throws URISyntaxException {
     ResponseEntity<String> response =
-        restTemplate.exchange(createRequestEntity(BASE_API_URL + HISTORY), String.class);
+        restTemplate.exchange(createRequestEntity(HISTORY), String.class);
     System.out.println(response);
   }
 }

@@ -19,7 +19,7 @@ public class SSEClientRunner implements CommandLineRunner {
   private void listenEndpoint(int stateId) {
     sseClientService.streamEvents(stateId).subscribe(
         event -> System.out.println("~~~~~~~~ RECEIVED EVENT: " + event),
-        error -> System.err.println("~~~~~~~~ ERROR OCCURED: " + error),
+        error -> System.err.println("~~~~~~~~ ERROR OCCURRED: " + error),
         () -> System.out.println("~~~~~~~~ SSE STREAM CLOSED.")
     );
   }

@@ -1,5 +1,6 @@
 package com.kozarenko.bot;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -20,5 +21,10 @@ public class TelegramBotApplication {
   @Bean
   public static RestTemplateBuilder restTemplateBuilder() {
     return new RestTemplateBuilder();
+  }
+
+  @Bean
+  public static ObjectMapper objectMapper() {
+    return new ObjectMapper();
   }
 }

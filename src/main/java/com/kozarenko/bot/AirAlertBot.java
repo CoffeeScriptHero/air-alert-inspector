@@ -1,5 +1,6 @@
 package com.kozarenko.bot;
 
+import com.kozarenko.bot.model.State;
 import com.kozarenko.bot.service.RestService;
 import com.kozarenko.bot.service.StateService;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,19 +17,23 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.net.URISyntaxException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class AirAlertBot extends TelegramLongPollingBot {
 
   private static final String DEFAULT_MENU_TEXT = "Обери функцію, що цікавить тебе.";
+  private static final String MAIN_MENU_TITLE = "Головне меню";
+  private static final String ARROW_RIGHT = "➡️";
+  private static final String ARROW_LEFT = "⬅️";
   private static final String API_MAP_URL = "https://alerts.com.ua/map.png";
   private static final String CALLBACK_MAP = "map";
-  private static final String CALLBACK_BACK = "back";
+  private static final String CALLBACK_MENU = "menu";
   private static final String CALLBACK_HISTORY = "history";
-  private static final String CALLBACK_MANAGE = "manage";
+  private static final String CALLBACK_STATES_PAGE_ONE = "states1";
+  private static final String CALLBACK_STATES_PAGE_TWO = "states2";
+  private static final String CALLBACK_STATES_PAGE_THREE = "states2";
+  private static final int STATES_FIRST_PAGE_MAX = 9;
 
   @Value("${bot.token}")
   private String token;
@@ -39,14 +44,17 @@ public class AirAlertBot extends TelegramLongPollingBot {
   @Value("${bot.id}")
   private long id;
 
-  private RestService restService;
+  private final RestService restService;
 
-  private StateService stateService;
+  private final StateService stateService;
 
   private int menuMessageId;
 
-  public AirAlertBot(RestService restService) {
+  private long chatId;
+
+  public AirAlertBot(RestService restService, StateService stateService) {
     this.restService = restService;
+    this.stateService = stateService;
   }
 
   @Override
@@ -64,8 +72,9 @@ public class AirAlertBot extends TelegramLongPollingBot {
 
         switch (message.getText()) {
           case "/start":
+            chatId = chat.getId();
             sendStartMessage(chat);
-            sendMenu(chat.getId());
+            sendMenu(chatId);
             break;
           default:
             try {
@@ -120,7 +129,7 @@ public class AirAlertBot extends TelegramLongPollingBot {
       Message msg = execute(SendMessage.builder()
           .chatId(chatId)
           .text(text)
-          .replyMarkup(buildMenu())
+          .replyMarkup(buildMainKeyboard())
           .build()
       );
 
@@ -142,7 +151,7 @@ public class AirAlertBot extends TelegramLongPollingBot {
     return false;
   }
 
-  private InlineKeyboardMarkup buildMenu() {
+  private InlineKeyboardMarkup buildMainKeyboard() {
     InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
     List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -152,7 +161,7 @@ public class AirAlertBot extends TelegramLongPollingBot {
     row1.add(InlineKeyboardButton.builder().text("\uD83D\uDDFA️ Мапа тривог").callbackData(CALLBACK_MAP).build());
     row1.add(InlineKeyboardButton.builder().text("Історія тривог").callbackData(CALLBACK_HISTORY).build());
 
-    row2.add(InlineKeyboardButton.builder().text("Менеджер областей").callbackData(CALLBACK_MANAGE).build());
+    row2.add(InlineKeyboardButton.builder().text("\uD83C\uDF03 Менеджер областей").callbackData(CALLBACK_STATES_PAGE_ONE).build());
     row2.add(InlineKeyboardButton.builder().text("Кнопка 4").callbackData("button4").build());
 
     keyboard.add(row1);
@@ -163,7 +172,7 @@ public class AirAlertBot extends TelegramLongPollingBot {
     return inlineKeyboardMarkup;
   }
 
-  private InlineKeyboardMarkup buildGoBackMenu() {
+  private InlineKeyboardMarkup buildGoBackKeyboard() {
     InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
     List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -171,7 +180,7 @@ public class AirAlertBot extends TelegramLongPollingBot {
         Collections.singletonList(
             InlineKeyboardButton.builder()
                 .text("⬅ Повернутись назад")
-                .callbackData(CALLBACK_BACK)
+                .callbackData(CALLBACK_MENU)
                 .build()
         )
     );
@@ -180,15 +189,42 @@ public class AirAlertBot extends TelegramLongPollingBot {
     return inlineKeyboardMarkup;
   }
 
+  private InlineKeyboardMarkup buildStatesKeyboardPageOne() {
+    InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+
+    List<InlineKeyboardButton> row1 = new ArrayList<>();
+    List<InlineKeyboardButton> row2 = new ArrayList<>();
+    List<InlineKeyboardButton> row3 = new ArrayList<>();
+    List<InlineKeyboardButton> row4 = new ArrayList<>();
+
+    List<List<InlineKeyboardButton>> rows = Arrays.asList(row1, row2, row3, row4);
+    List<State> states = stateService.getStates().subList(0, STATES_FIRST_PAGE_MAX);
+
+    for (State state : states) {
+      rows.get((state.getId() - 1) / 3).add(
+          InlineKeyboardButton.builder().text(state.getName()).callbackData(String.valueOf(state.getId())).build()
+      );
+    }
+
+    row4.add(InlineKeyboardButton.builder().text(MAIN_MENU_TITLE).callbackData(CALLBACK_MENU).build());
+    row4.add(InlineKeyboardButton.builder().text(ARROW_RIGHT).callbackData(CALLBACK_STATES_PAGE_TWO).build());
+
+    List<List<InlineKeyboardButton>> keyboard = new ArrayList<>(rows);
+    inlineKeyboardMarkup.setKeyboard(keyboard);
+
+    return inlineKeyboardMarkup;
+  }
+
   public void handleCallback(CallbackQuery callbackQuery) {
     switch (callbackQuery.getData()) {
-      case CALLBACK_MAP -> onMapOption(callbackQuery);
-      case CALLBACK_BACK-> onBackOption(callbackQuery);
-      case CALLBACK_HISTORY -> onHistoryOption(callbackQuery);
+      case CALLBACK_MAP -> onMapQuery(callbackQuery);
+      case CALLBACK_MENU-> onMenuQuery(callbackQuery);
+      case CALLBACK_HISTORY -> onHistoryQuery(callbackQuery);
+      case CALLBACK_STATES_PAGE_ONE -> onStatesPageOneQuery(callbackQuery);
     }
   }
 
-  private void onMapOption(CallbackQuery callbackQuery) {
+  private void onMapQuery(CallbackQuery callbackQuery) {
     try {
       execute(
           DeleteMessage.builder()
@@ -205,7 +241,7 @@ public class AirAlertBot extends TelegramLongPollingBot {
               .chatId(callbackQuery.getMessage().getChatId())
               .caption(String.format("Мапа України станом на *%s*", LocalTime.now().format(dtf)))
               .parseMode("Markdown")
-              .replyMarkup(buildGoBackMenu())
+              .replyMarkup(buildGoBackKeyboard())
               .build()
       );
 
@@ -215,7 +251,7 @@ public class AirAlertBot extends TelegramLongPollingBot {
     }
   }
 
-  private void onHistoryOption(CallbackQuery callbackQuery) {
+  private void onHistoryQuery(CallbackQuery callbackQuery) {
     try {
       restService.getAirAlertHistory();
     } catch (URISyntaxException ex) {
@@ -223,7 +259,7 @@ public class AirAlertBot extends TelegramLongPollingBot {
     }
   }
 
-  private void onBackOption(CallbackQuery callbackQuery) {
+  private void onMenuQuery(CallbackQuery callbackQuery) {
     try {
       execute(
           DeleteMessage.builder()
@@ -236,5 +272,9 @@ public class AirAlertBot extends TelegramLongPollingBot {
     } catch (TelegramApiException ex) {
       ex.printStackTrace();
     }
+  }
+
+  private void onStatesPageOneQuery(CallbackQuery callbackQuery) {
+
   }
 }
