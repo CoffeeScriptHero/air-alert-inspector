@@ -32,6 +32,8 @@ public class SenderService extends DefaultAbsSender {
   }
 
   public void sendStartMessage(Chat chat) {
+    System.out.println("~~~~~~~~~ CHAT ID : " + chat.getId());
+
     String greetingsText = chat.getType().equals(GROUP) || chat.getType().equals(SUPERGROUP)
         ? "Вітаю всіх учасників групи " + chat.getTitle() + "!"
         : "Вітаю, " + chat.getFirstName() + " " + chat.getLastName() + "!";
