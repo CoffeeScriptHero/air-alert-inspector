@@ -2,6 +2,7 @@ package com.kozarenko.bot.service;
 
 import com.kozarenko.bot.component.StateDataProvider;
 import com.kozarenko.bot.model.State;
+import com.kozarenko.bot.model.Subscription;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -25,6 +26,7 @@ public class KeyboardService {
   private static final String CAPTION_MAIN_MENU = "До меню";
   private static final String ARROW_RIGHT = "➡️";
   private static final String ARROW_LEFT = "⬅️";
+  private static final String EYES = "\uD83D\uDC40";
   private static final int STATES_PER_PAGE = 8;
   private static final int STATES_PER_ROW = 2;
 
@@ -61,16 +63,18 @@ public class KeyboardService {
         .build();
   }
 
-  public InlineKeyboardMarkup buildStatesKeyboard(int page) {
+  public InlineKeyboardMarkup buildStatesKeyboard(int page, List<Subscription> subscriptions) {
+    List<Integer> stateIds = subscriptions.stream().map(Subscription::getStateId).toList();
     List<List<InlineKeyboardButton>> keyboard = generateKeyboard();
     int fromIndex = STATES_PER_PAGE * (page - 1);
     int toIndex = page == 4 ? fromIndex + 1 : STATES_PER_PAGE * page;
     List<State> states = stateDataProvider.getStates().subList(fromIndex, toIndex);
 
     for (State state : states) {
+      String text = isSubscription(state, stateIds) ? EYES + state.getNameOfState() : state.getNameOfState();
       int i = page == 1 ? state.getId() - 1 : (state.getId() - 1) % fromIndex;
       keyboard.get(i / STATES_PER_ROW).add(
-          InlineKeyboardButton.builder().text(state.getNameOfState()).callbackData(String.valueOf(state.getId())).build()
+          InlineKeyboardButton.builder().text(text).callbackData(String.valueOf(state.getId())).build()
       );
     }
 
@@ -95,6 +99,10 @@ public class KeyboardService {
     keyboard.add(navigationRow);
 
     return InlineKeyboardMarkup.builder().keyboard(keyboard).build();
+  }
+
+  private boolean isSubscription(State state, List<Integer> stateIds) {
+    return stateIds.contains(state.getId());
   }
 
   private List<List<InlineKeyboardButton>> generateKeyboard() {

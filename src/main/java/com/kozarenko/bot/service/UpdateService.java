@@ -15,16 +15,16 @@ public class UpdateService {
   private static final String COMMAND_MENU = "/menu";
 
   private final SSEService sseService;
-  private final ChatIdService chatIdService;
+  private final SubscriptionService subscriptionService;
   private final SenderService senderService;
   private final CallbackService callbackService;
 
   public UpdateService(SenderService senderService,
-                       ChatIdService chatIdService,
+                       SubscriptionService subscriptionService,
                        CallbackService callbackService,
                        SSEService sseService) {
     this.senderService = senderService;
-    this.chatIdService = chatIdService;
+    this.subscriptionService = subscriptionService;
     this.callbackService = callbackService;
     this.sseService = sseService;
   }
@@ -35,7 +35,7 @@ public class UpdateService {
       Message message = update.getMessage();
 
       if (botAddedToGroup(message, botId)) {
-        saveChat(message.getChat().getId());
+        generateSubscriptions(message.getChat().getId());
         senderService.sendStartMessage(message.getChat());
         senderService.sendMenu(message.getChat().getId());
         return;
@@ -46,7 +46,7 @@ public class UpdateService {
 
         switch (message.getText()) {
           case COMMAND_START -> {
-            saveChat(message.getChat().getId());
+            generateSubscriptions(message.getChat().getId());
             senderService.sendStartMessage(chat);
             senderService.sendMenu(chat.getId());
 //            sseService.connectForUser(update.getMessage().getFrom().getId(), List.of(4, 11, 25));
@@ -59,10 +59,11 @@ public class UpdateService {
     }
   }
 
-  private void saveChat(Long id) {
-    if (!chatIdService.existsByChatId(id)) {
-      chatIdService.save(id);
+  private void generateSubscriptions(Long chatId) {
+    if (!subscriptionService.existsByChatId(chatId)) {
+      subscriptionService.saveNewChatSubscriptions(chatId);
     }
+    System.out.println("Nope. Subscriptions already exist");
   }
 
   private boolean botAddedToGroup(Message message, long botId) {

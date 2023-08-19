@@ -2,11 +2,9 @@ package com.kozarenko.bot.model;
 
 import jakarta.persistence.*;
 
-import java.util.Set;
-
 @Entity
-@Table(name = "chat")
-public class ChatId {
+@Table(name = "subscription")
+public class Subscription {
 
   @Id
   @Column(name = "id")
@@ -16,18 +14,14 @@ public class ChatId {
   @Column(name = "chat_id")
   private Long chatId;
 
-  @ManyToMany
-  @JoinTable(
-      name = "chat_state",
-      joinColumns = @JoinColumn(name = "chat_id"),
-      inverseJoinColumns = @JoinColumn(name = "state_id")
-  )
-  private Set<StateId> subscriptions;
+  @Column(name = "state_id")
+  private Integer stateId;
 
-  public ChatId() {}
+  public Subscription() {}
 
-  public ChatId(Long chatId) {
+  public Subscription(Long chatId, Integer stateId) {
     this.chatId = chatId;
+    this.stateId = stateId;
   }
 
   public Long getId() {
@@ -46,12 +40,12 @@ public class ChatId {
     this.chatId = chatId;
   }
 
-  public Set<StateId> getSubscriptions() {
-    return subscriptions;
+  public Integer getStateId() {
+    return stateId;
   }
 
-  public void setSubscriptions(Set<StateId> subscriptions) {
-    this.subscriptions = subscriptions;
+  public void setStateId(Integer stateId) {
+    this.stateId = stateId;
   }
 
   @Override
@@ -59,16 +53,18 @@ public class ChatId {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    ChatId chatId = (ChatId) o;
+    Subscription subscription = (Subscription) o;
 
-    if (!id.equals(chatId.id)) return false;
-    return this.chatId.equals(chatId.chatId);
+    if (!id.equals(subscription.id)) return false;
+    if (!chatId.equals(subscription.chatId)) return false;
+    return stateId.equals(subscription.stateId);
   }
 
   @Override
   public int hashCode() {
     int result = id.hashCode();
     result = 31 * result + chatId.hashCode();
+    result = 31 * result + stateId.hashCode();
     return result;
   }
 }

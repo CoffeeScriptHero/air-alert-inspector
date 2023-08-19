@@ -13,6 +13,9 @@ import java.util.List;
 @Component
 public class StateDataProvider {
 
+  public static final int STATE_FIRST_ID = 1;
+  public static final int STATE_LAST_ID = 25;
+
   private List<State> states;
   private final RestService restService;
 
