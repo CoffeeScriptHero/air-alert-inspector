@@ -6,6 +6,7 @@ public class Constants {
     public static final String API_MAP_URL = "https://alerts.com.ua/map.png";
     public static final String BASE_API_URL = "https://alerts.com.ua";
     public static final String API_KEY_HEADER = "X-API-Key";
+    public static final String CALLBACK_STATE_PREFIX = "state-";
     public static final String CALLBACK_MAP = "map";
     public static final String CALLBACK_MENU = "menu";
     public static final String CALLBACK_HISTORY = "history";

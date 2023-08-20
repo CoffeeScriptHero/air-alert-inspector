@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class StateDataProvider {
@@ -31,6 +32,10 @@ public class StateDataProvider {
       this.states = getDefaultStates();
       ex.printStackTrace();
     }
+  }
+
+  public Optional<State> getStateById(int id) {
+    return states.stream().filter(state -> state.getId() == id).findFirst();
   }
 
   public List<State> getStates() {

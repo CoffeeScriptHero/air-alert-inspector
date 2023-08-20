@@ -12,7 +12,7 @@ import java.util.Map;
 public class StateMapper {
 
   private final ObjectMapper objectMapper =
-      new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);;
+      new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
   public List<State> statesFromJson(String json) throws JsonProcessingException {
     Map<String, Object> jsonMap = objectMapper.readValue(json, new TypeReference<>() {});

@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -32,8 +35,6 @@ public class SenderService extends DefaultAbsSender {
   }
 
   public void sendStartMessage(Chat chat) {
-    System.out.println("~~~~~~~~~ CHAT ID : " + chat.getId());
-
     String greetingsText = chat.getType().equals(GROUP) || chat.getType().equals(SUPERGROUP)
         ? "Вітаю всіх учасників групи " + chat.getTitle() + "!"
         : "Вітаю, " + chat.getFirstName() + " " + chat.getLastName() + "!";
@@ -59,6 +60,30 @@ public class SenderService extends DefaultAbsSender {
       execute(SendMessage.builder()
           .chatId(chatId)
           .text(text)
+          .replyMarkup(keyboardMarkup)
+          .build()
+      );
+    } catch (TelegramApiException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  public void sendCallbackQueryAnswer(String callbackQueryId, String text) {
+    try {
+      execute(AnswerCallbackQuery.builder()
+          .callbackQueryId(callbackQueryId)
+          .text(text)
+          .build());
+    } catch (TelegramApiException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  public void sendEditedReplyMarkup(long chatId, int messageId, InlineKeyboardMarkup keyboardMarkup) {
+    try {
+      execute(EditMessageReplyMarkup.builder()
+          .chatId(chatId)
+          .messageId(messageId)
           .replyMarkup(keyboardMarkup)
           .build()
       );

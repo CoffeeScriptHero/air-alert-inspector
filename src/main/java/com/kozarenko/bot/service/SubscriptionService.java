@@ -45,4 +45,13 @@ public class SubscriptionService {
   public List<Subscription> getSubscriptions(Long chatId) {
     return subscriptionRepository.getSubscriptionsByChatId(chatId);
   }
+
+  public boolean toggleSubscription(Long chatId, Integer stateId) {
+    if (isSubscriptionExists(chatId, stateId)) {
+      deleteSubscription(chatId, stateId);
+      return false;
+    }
+    saveSubscription(chatId, stateId);
+    return true;
+  }
 }

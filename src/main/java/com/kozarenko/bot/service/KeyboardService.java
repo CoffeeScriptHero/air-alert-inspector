@@ -18,6 +18,9 @@ import static com.kozarenko.bot.util.Constants.*;
 @Service
 public class KeyboardService {
 
+  public static final int STATES_PER_PAGE = 8;
+  public static final int STATES_PER_ROW = 2;
+
   private static final String CAPTION_ALERT_MAP = "\uD83D\uDDFA️ Мапа тривог";
   private static final String CAPTION_ALERT_HISTORY = "Історія тривог";
   private static final String CAPTION_STATES = "\uD83C\uDF03 Області";
@@ -27,8 +30,6 @@ public class KeyboardService {
   private static final String ARROW_RIGHT = "➡️";
   private static final String ARROW_LEFT = "⬅️";
   private static final String EYES = "\uD83D\uDC40";
-  private static final int STATES_PER_PAGE = 8;
-  private static final int STATES_PER_ROW = 2;
 
   private final StateDataProvider stateDataProvider;
 
@@ -38,28 +39,14 @@ public class KeyboardService {
 
   public InlineKeyboardMarkup buildMainKeyboard() {
     return InlineKeyboardMarkup.builder().keyboard(List.of(
-        List.of(
-            InlineKeyboardButton.builder().text(CAPTION_ALERT_MAP).callbackData(CALLBACK_MAP).build(),
-            InlineKeyboardButton.builder().text(CAPTION_ALERT_HISTORY).callbackData(CALLBACK_HISTORY).build()
-        ),
-        List.of(
-            InlineKeyboardButton.builder().text(CAPTION_STATES).callbackData(CALLBACK_STATES_PAGE_ONE).build(),
-            InlineKeyboardButton.builder().text(CAPTION_FOUR).callbackData("button4").build()
-        )
+        List.of(buildButton(CAPTION_ALERT_MAP, CALLBACK_MAP), buildButton(CAPTION_ALERT_HISTORY, CALLBACK_HISTORY)),
+        List.of(buildButton(CAPTION_STATES, CALLBACK_STATES_PAGE_ONE), buildButton(CAPTION_FOUR, "button4"))
     )).build();
   }
 
   public InlineKeyboardMarkup buildGoBackKeyboard() {
-    return InlineKeyboardMarkup.builder().keyboard(
-            List.of(
-                Collections.singletonList(
-                    InlineKeyboardButton.builder()
-                        .text(CAPTION_GO_BACK)
-                        .callbackData(CALLBACK_MENU)
-                        .build()
-                )
-            )
-        )
+    return InlineKeyboardMarkup.builder()
+        .keyboard(List.of(Collections.singletonList(buildButton(CAPTION_GO_BACK, CALLBACK_MENU))))
         .build();
   }
 
@@ -71,11 +58,9 @@ public class KeyboardService {
     List<State> states = stateDataProvider.getStates().subList(fromIndex, toIndex);
 
     for (State state : states) {
-      String text = isSubscription(state, stateIds) ? EYES + state.getNameOfState() : state.getNameOfState();
+      String text = isSubscription(state, stateIds) ? EYES + " " + state.getNameOfState() : state.getNameOfState();
       int i = page == 1 ? state.getId() - 1 : (state.getId() - 1) % fromIndex;
-      keyboard.get(i / STATES_PER_ROW).add(
-          InlineKeyboardButton.builder().text(text).callbackData(String.valueOf(state.getId())).build()
-      );
+      keyboard.get(i / STATES_PER_ROW).add(buildButton(text, CALLBACK_STATE_PREFIX + state.getId()));
     }
 
     List<InlineKeyboardButton> navigationRow = new ArrayList<>();
@@ -84,16 +69,16 @@ public class KeyboardService {
       String callbackData = page == 2
           ? CALLBACK_STATES_PAGE_ONE
           : (page == 3 ? CALLBACK_STATES_PAGE_TWO : CALLBACK_STATES_PAGE_THREE);
-      navigationRow.add(InlineKeyboardButton.builder().text(ARROW_LEFT).callbackData(callbackData).build());
+      navigationRow.add(buildButton(ARROW_LEFT, callbackData));
     }
 
-    navigationRow.add(InlineKeyboardButton.builder().text(CAPTION_MAIN_MENU).callbackData(CALLBACK_MENU).build());
+    navigationRow.add(buildButton(CAPTION_MAIN_MENU, CALLBACK_MENU));
 
     if (page < 4) {
       String callbackData = page == 1
           ? CALLBACK_STATES_PAGE_TWO
           : (page == 2 ? CALLBACK_STATES_PAGE_THREE : CALLBACK_STATES_PAGE_FOUR);
-      navigationRow.add(InlineKeyboardButton.builder().text(ARROW_RIGHT).callbackData(callbackData).build());
+      navigationRow.add(buildButton(ARROW_RIGHT, callbackData));
     }
 
     keyboard.add(navigationRow);
@@ -103,6 +88,13 @@ public class KeyboardService {
 
   private boolean isSubscription(State state, List<Integer> stateIds) {
     return stateIds.contains(state.getId());
+  }
+
+  private InlineKeyboardButton buildButton(String text, String callbackData) {
+    return InlineKeyboardButton.builder()
+        .text(text)
+        .callbackData(callbackData)
+        .build();
   }
 
   private List<List<InlineKeyboardButton>> generateKeyboard() {
