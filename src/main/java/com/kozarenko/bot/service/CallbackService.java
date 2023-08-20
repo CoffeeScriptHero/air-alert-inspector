@@ -13,10 +13,10 @@ public class CallbackService {
   private static final String STATE_UNSUBSCRIBED = "Ви відписалися від ";
   private static final String STATE_PAGE_TEXT =
       """
-      ⬇️ Оберіть будь-яку область нижче.
-      
-      \uD83D\uDC40 означає, що ви підписані на дану область.
-      """;
+          ⬇️ Оберіть будь-яку область нижче.
+                
+          \uD83D\uDC40 означає, що ви підписані на дану область.
+          """;
 
   private final SenderService senderService;
   private final KeyboardService keyboardService;
@@ -39,13 +39,18 @@ public class CallbackService {
     int messageId = callbackQuery.getMessage().getMessageId();
     String queryData = callbackQuery.getData();
 
-    if (!queryData.startsWith(CALLBACK_STATE_PREFIX)) {
+    if (!queryData.equals(CALLBACK_SUBSCRIBE_ALL)
+        && !queryData.equals(CALLBACK_UNSUBSCRIBE_ALL)
+        && !queryData.startsWith(CALLBACK_STATE_PREFIX)) {
       senderService.deleteMessage(chatId, messageId);
     }
 
     switch (queryData) {
       case CALLBACK_MAP -> senderService.sendAlertMap(chatId);
       case CALLBACK_MENU -> senderService.sendMenu(chatId);
+      case CALLBACK_SUBSCRIBE_ALL -> onSubscribeAll(callbackQuery.getId(), chatId);
+      case CALLBACK_UNSUBSCRIBE_ALL -> onUnsubscribeAll(callbackQuery.getId(), chatId);
+      case CALLBACK_HELP -> System.out.println("Help!");
       case CALLBACK_STATES_PAGE_ONE,
           CALLBACK_STATES_PAGE_TWO,
           CALLBACK_STATES_PAGE_THREE,
@@ -54,13 +59,23 @@ public class CallbackService {
     }
   }
 
+  private void onSubscribeAll(String queryId, long chatId) {
+    subscriptionService.subscribeToAllStates(chatId);
+    senderService.sendCallbackQueryAnswer(queryId, "Ви підписались на всі області");
+  }
+
+  private void onUnsubscribeAll(String queryId, long chatId) {
+    subscriptionService.unsubscribeFromAllStates(chatId);
+    senderService.sendCallbackQueryAnswer(queryId, "Ви відписались від усіх областей");
+  }
+
   private void onStatePage(String queryData, long chatId) {
     senderService.sendMenu(
         chatId,
         STATE_PAGE_TEXT,
         keyboardService.buildStatesKeyboard(
             Integer.parseInt(queryData.substring(queryData.length() - 1)),
-            subscriptionService.getSubscriptions(chatId)
+            subscriptionService.retrieveStateIdsForChat(chatId)
         )
     );
   }
@@ -84,7 +99,7 @@ public class CallbackService {
     senderService.sendEditedReplyMarkup(
         chatId,
         messageId,
-        keyboardService.buildStatesKeyboard(page, subscriptionService.getSubscriptions(chatId))
+        keyboardService.buildStatesKeyboard(page, subscriptionService.retrieveStateIdsForChat(chatId))
     );
   }
 }

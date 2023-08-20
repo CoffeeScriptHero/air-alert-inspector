@@ -6,7 +6,6 @@ import com.kozarenko.bot.repository.SubscriptionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -26,12 +25,19 @@ public class SubscriptionService {
     return subscriptionRepository.existsByChatIdAndStateId(chatId, stateId);
   }
 
-  public void saveNewChatSubscriptions(Long chatId) {
+  public void subscribeToAllStates(Long chatId) {
+    List<Integer> stateIds = retrieveStateIdsForChat(chatId);
+
     subscriptionRepository.saveAll(
         IntStream.rangeClosed(StateDataProvider.STATE_FIRST_ID, StateDataProvider.STATE_LAST_ID)
+            .filter(stateId -> !stateIds.contains(stateId))
             .mapToObj(stateId -> new Subscription(chatId, stateId))
-            .collect(Collectors.toList())
+            .toList()
     );
+  }
+
+  public void unsubscribeFromAllStates(Long chatId) {
+    subscriptionRepository.deleteAllByChatId(chatId);
   }
 
   public void saveSubscription(Long chatId, Integer stateId) {
@@ -44,6 +50,10 @@ public class SubscriptionService {
 
   public List<Subscription> getSubscriptions(Long chatId) {
     return subscriptionRepository.getSubscriptionsByChatId(chatId);
+  }
+
+  public List<Integer> retrieveStateIdsForChat(Long chatId) {
+    return getSubscriptions(chatId).stream().map(Subscription::getStateId).toList();
   }
 
   public boolean toggleSubscription(Long chatId, Integer stateId) {

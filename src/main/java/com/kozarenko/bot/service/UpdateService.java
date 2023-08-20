@@ -1,11 +1,13 @@
 package com.kozarenko.bot.service;
 
+import com.kozarenko.bot.model.Subscription;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,10 +48,12 @@ public class UpdateService {
 
         switch (message.getText()) {
           case COMMAND_START -> {
-            generateSubscriptions(message.getChat().getId());
+            generateSubscriptions(chat.getId());
             senderService.sendStartMessage(chat);
             senderService.sendMenu(chat.getId());
-//            sseService.connectForUser(update.getMessage().getFrom().getId(), List.of(4, 11, 25));
+            sseService.connectForUser(
+                update.getMessage().getFrom().getId(), subscriptionService.retrieveStateIdsForChat(chat.getId())
+            );
           }
           case COMMAND_MENU -> senderService.sendMenu(chat.getId());
         }
@@ -61,9 +65,8 @@ public class UpdateService {
 
   private void generateSubscriptions(Long chatId) {
     if (!subscriptionService.existsByChatId(chatId)) {
-      subscriptionService.saveNewChatSubscriptions(chatId);
+      subscriptionService.subscribeToAllStates(chatId);
     }
-    System.out.println("Nope. Subscriptions already exist");
   }
 
   private boolean botAddedToGroup(Message message, long botId) {

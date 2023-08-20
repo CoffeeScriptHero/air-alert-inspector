@@ -9,7 +9,9 @@ public class Constants {
     public static final String CALLBACK_STATE_PREFIX = "state-";
     public static final String CALLBACK_MAP = "map";
     public static final String CALLBACK_MENU = "menu";
-    public static final String CALLBACK_HISTORY = "history";
+    public static final String CALLBACK_HELP = "help";
+    public static final String CALLBACK_SUBSCRIBE_ALL = "subscribe-all";
+    public static final String CALLBACK_UNSUBSCRIBE_ALL = "unsubscribe-all";
     public static final String CALLBACK_STATES_PAGE_ONE = "states-page-1";
     public static final String CALLBACK_STATES_PAGE_TWO = "states-page-2";
     public static final String CALLBACK_STATES_PAGE_THREE = "states-page-3";

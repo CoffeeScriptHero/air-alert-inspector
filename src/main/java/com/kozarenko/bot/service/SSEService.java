@@ -8,18 +8,22 @@ import java.util.List;
 public class SSEService {
 
   private final SSEClientService sseClientService;
+  private final SenderService senderService;
 
-  public SSEService(SSEClientService sseClientService) {
+  public SSEService(SSEClientService sseClientService, SenderService senderService) {
     this.sseClientService = sseClientService;
+    this.senderService = senderService;
   }
 
   public void connectForUser(long userId, List<Integer> ids) {
-    ids.forEach(id -> sseClientService.streamEvents(id).subscribe(
-        event -> {
-          System.out.println("RECEIVED EVENT FOR USER " + userId + ": " + event);
-        },
+    sseClientService.streamEvents().subscribe(
+        this::handleEvent,
         error -> System.err.println("ERROR"),
         () -> System.out.println("~~~~~~~ SSE Stream for user is closed")
-    ));
+    );
+  }
+
+  private void handleEvent(String event) {
+    System.out.println("RECEIVED EVENT: " + event);
   }
 }

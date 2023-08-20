@@ -22,9 +22,10 @@ public class KeyboardService {
   public static final int STATES_PER_ROW = 2;
 
   private static final String CAPTION_ALERT_MAP = "\uD83D\uDDFA️ Мапа тривог";
-  private static final String CAPTION_ALERT_HISTORY = "Історія тривог";
   private static final String CAPTION_STATES = "\uD83C\uDF03 Області";
-  private static final String CAPTION_FOUR = "Кнопка 4";
+  private static final String CAPTION_SUBSCRIBE_ALL = "➕ Підписатися на всі області";
+  private static final String CAPTION_UNSUBSCRIBE_ALL = "➖ Відписатися від усіх областей";
+  private static final String CAPTION_HELP = "❔ Допомога";
   private static final String CAPTION_GO_BACK = "⬅ Повернутись назад";
   private static final String CAPTION_MAIN_MENU = "До меню";
   private static final String ARROW_RIGHT = "➡️";
@@ -39,8 +40,10 @@ public class KeyboardService {
 
   public InlineKeyboardMarkup buildMainKeyboard() {
     return InlineKeyboardMarkup.builder().keyboard(List.of(
-        List.of(buildButton(CAPTION_ALERT_MAP, CALLBACK_MAP), buildButton(CAPTION_ALERT_HISTORY, CALLBACK_HISTORY)),
-        List.of(buildButton(CAPTION_STATES, CALLBACK_STATES_PAGE_ONE), buildButton(CAPTION_FOUR, "button4"))
+        List.of(buildButton(CAPTION_ALERT_MAP, CALLBACK_MAP), buildButton(CAPTION_STATES, CALLBACK_STATES_PAGE_ONE)),
+        List.of(buildButton(CAPTION_SUBSCRIBE_ALL, CALLBACK_SUBSCRIBE_ALL)),
+        List.of(buildButton(CAPTION_UNSUBSCRIBE_ALL, CALLBACK_UNSUBSCRIBE_ALL)),
+        List.of(buildButton(CAPTION_HELP, CALLBACK_HELP))
     )).build();
   }
 
@@ -50,15 +53,14 @@ public class KeyboardService {
         .build();
   }
 
-  public InlineKeyboardMarkup buildStatesKeyboard(int page, List<Subscription> subscriptions) {
-    List<Integer> stateIds = subscriptions.stream().map(Subscription::getStateId).toList();
+  public InlineKeyboardMarkup buildStatesKeyboard(int page, List<Integer> subscribedStates) {
     List<List<InlineKeyboardButton>> keyboard = generateKeyboard();
     int fromIndex = STATES_PER_PAGE * (page - 1);
     int toIndex = page == 4 ? fromIndex + 1 : STATES_PER_PAGE * page;
     List<State> states = stateDataProvider.getStates().subList(fromIndex, toIndex);
 
     for (State state : states) {
-      String text = isSubscription(state, stateIds) ? EYES + " " + state.getNameOfState() : state.getNameOfState();
+      String text = isSubscription(state, subscribedStates) ? EYES + " " + state.getNameOfState() : state.getNameOfState();
       int i = page == 1 ? state.getId() - 1 : (state.getId() - 1) % fromIndex;
       keyboard.get(i / STATES_PER_ROW).add(buildButton(text, CALLBACK_STATE_PREFIX + state.getId()));
     }

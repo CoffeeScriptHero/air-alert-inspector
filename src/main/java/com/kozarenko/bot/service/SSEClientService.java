@@ -11,7 +11,7 @@ import static com.kozarenko.bot.util.Constants.BASE_API_URL;
 @Service
 public class SSEClientService {
 
-  private static final String API_STATE_LIVE = "/api/states/live/";
+  private static final String API_STATE_LIVE = "/api/states/live";
 
   @Value("${api.key}")
   private String apiKey;
@@ -22,9 +22,9 @@ public class SSEClientService {
     this.webClient = WebClient.create(BASE_API_URL);
   }
 
-  public Flux<String> streamEvents(int stateId) {
+  public Flux<String> streamEvents() {
     return webClient.get()
-        .uri(API_STATE_LIVE + stateId)
+        .uri(API_STATE_LIVE)
         .header(API_KEY_HEADER, apiKey)
         .retrieve()
         .bodyToFlux(String.class);

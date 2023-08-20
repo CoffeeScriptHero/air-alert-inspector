@@ -20,7 +20,6 @@ import static com.kozarenko.bot.util.Constants.BASE_API_URL;
 @Service
 public class RestService {
 
-  private static final String HISTORY = "/api/history";
   private static final String STATES = "/api/states";
 
   private final RestTemplate restTemplate;
@@ -54,11 +53,5 @@ public class RestService {
     }
 
     return List.of();
-  }
-
-  public void getAirAlertHistory() throws URISyntaxException {
-    ResponseEntity<String> response =
-        restTemplate.exchange(createRequestEntity(HISTORY), String.class);
-    System.out.println(response);
   }
 }

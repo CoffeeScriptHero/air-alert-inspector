@@ -17,5 +17,8 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
   List<Subscription> getSubscriptionsByChatId(Long chatId);
 
   @Transactional
+  void deleteAllByChatId(Long chatId);
+
+  @Transactional
   void deleteByChatIdAndStateId(Long chatId, Integer stateId);
 }
