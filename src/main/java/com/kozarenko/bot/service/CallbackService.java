@@ -50,7 +50,7 @@ public class CallbackService {
       case CALLBACK_MENU -> senderService.sendMenu(chatId);
       case CALLBACK_SUBSCRIBE_ALL -> onSubscribeAll(callbackQuery.getId(), chatId);
       case CALLBACK_UNSUBSCRIBE_ALL -> onUnsubscribeAll(callbackQuery.getId(), chatId);
-      case CALLBACK_HELP -> System.out.println("Help!");
+      case CALLBACK_HELP -> senderService.sendHelpMenu(chatId);
       case CALLBACK_STATES_PAGE_ONE,
           CALLBACK_STATES_PAGE_TWO,
           CALLBACK_STATES_PAGE_THREE,

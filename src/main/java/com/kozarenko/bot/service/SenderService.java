@@ -18,6 +18,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import static com.kozarenko.bot.util.Constants.API_MAP_URL;
+import static com.kozarenko.bot.util.Constants.PARSE_MODE_MARKDOWN;
 
 @Service
 public class SenderService extends DefaultAbsSender {
@@ -25,6 +26,35 @@ public class SenderService extends DefaultAbsSender {
   private static final String DEFAULT_MENU_TEXT = "Обери функцію, що цікавить тебе.";
   private static final String GROUP = "group";
   private static final String SUPERGROUP = "supergroup";
+  private static final String BOT_DESCRIPTION =
+      """
+      \n
+      Я - бот, що повідомляє про активацію повітряної тривоги в областях.
+      
+      Мій функціонал передбачає, що ви можете вибірково підписуватись на області, повітряну тривогу яких ви хочете
+      відслідковувати. За замовчуванням, при старті цього бота, ви підписані на всі області України.
+      
+      Основна комунікація зі мною відбувається через меню (яке відкривається за допомогою кнопки меню зліва від поля
+      введеня повідомлення або ж через команду /menu).
+      Меню містить наступні пункти:
+      
+      •   \uD83D\uDDFA️ *Мапа тривог* - отримати актуальну мапу повітряних тривог України
+      
+      •   \uD83C\uDF03 *Області* - відкриває меню для керування підписками на області. Якщо ви відпишетесь від області, вам не буде надходити повідомлення про початок/кінець повітряної тривоги в даній області
+      
+      •   ➕ *Підписатися на всі області* - підписка на всі області України
+      
+      •   ➖ *Відписатися від усіх областей* - відписка від усіх областей України
+      _Прим.: відписуючись від усіх областей, ви не отримуватимете жодних повідомлень.
+      Ця опція існує для зручності, щоб з нуля вибірково обрати області, які ви хочете відслідковувати, тож відписавшись від усіх областей, не забудьте потім підписатись на області, за якими ви хочете спостерігати._
+      
+      •   ❔ *Допомога* - показує повідомлення з роз'ясненням функціоналу бота та його основних функцій
+      
+      Також бот підтримує декілька команд:
+      
+      */menu* - відкриває головне меню
+      */help* - те саме, що й кнопка ❔ Допомога
+      """;
 
   private final KeyboardService keyboardService;
 
@@ -42,7 +72,8 @@ public class SenderService extends DefaultAbsSender {
       execute(
           SendMessage.builder()
               .chatId(chat.getId())
-              .text(greetingsText + " Я бот, що повідомляє про активацію повітряної тривоги в містах та областях.")
+              .text(greetingsText + BOT_DESCRIPTION)
+              .parseMode(PARSE_MODE_MARKDOWN)
               .build()
       );
     } catch (TelegramApiException ex) {
@@ -108,10 +139,35 @@ public class SenderService extends DefaultAbsSender {
               .photo(new InputFile(API_MAP_URL + "?t=" + System.currentTimeMillis()))
               .chatId(chatId)
               .caption(String.format("Мапа України станом на *%s*", LocalTime.now().format(dtf)))
-              .parseMode("Markdown")
+              .parseMode(PARSE_MODE_MARKDOWN)
               .replyMarkup(keyboardService.buildGoBackKeyboard())
               .build()
       );
+    } catch (TelegramApiException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  public void sendHelpMessage(long chatId) {
+    try {
+      execute(SendMessage.builder()
+          .chatId(chatId)
+          .text(BOT_DESCRIPTION)
+          .parseMode(PARSE_MODE_MARKDOWN)
+          .build());
+    } catch (TelegramApiException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  public void sendHelpMenu(long chatId) {
+    try {
+      execute(SendMessage.builder()
+          .chatId(chatId)
+          .text(BOT_DESCRIPTION)
+          .parseMode(PARSE_MODE_MARKDOWN)
+          .replyMarkup(keyboardService.buildGoBackKeyboard())
+          .build());
     } catch (TelegramApiException ex) {
       ex.printStackTrace();
     }

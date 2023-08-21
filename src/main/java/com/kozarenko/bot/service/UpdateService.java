@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -15,6 +14,7 @@ public class UpdateService {
 
   private static final String COMMAND_START = "/start";
   private static final String COMMAND_MENU = "/menu";
+  private static final String COMMAND_HELP = "/help";
 
   private final SSEService sseService;
   private final SubscriptionService subscriptionService;
@@ -56,6 +56,7 @@ public class UpdateService {
             );
           }
           case COMMAND_MENU -> senderService.sendMenu(chat.getId());
+          case COMMAND_HELP -> senderService.sendHelpMessage(chat.getId());
         }
       }
     } else if (update.hasCallbackQuery()) {

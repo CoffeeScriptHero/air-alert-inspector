@@ -2,7 +2,6 @@ package com.kozarenko.bot.service;
 
 import com.kozarenko.bot.component.StateDataProvider;
 import com.kozarenko.bot.model.State;
-import com.kozarenko.bot.model.Subscription;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
