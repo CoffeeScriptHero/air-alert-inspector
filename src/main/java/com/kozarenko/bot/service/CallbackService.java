@@ -100,9 +100,7 @@ public class CallbackService {
     boolean isSubscribe = subscriptionService.toggleSubscription(chatId, stateId);
     String stateName = stateDataProvider.getStateById(stateId).get().getName();
 
-    senderService.sendCallbackQueryAnswer(queryId, isSubscribe
-        ? STATE_SUBSCRIBED + stateName
-        : STATE_UNSUBSCRIBED + stateName);
+    senderService.sendCallbackQueryAnswer(queryId, (isSubscribe ? STATE_SUBSCRIBED : STATE_UNSUBSCRIBED) + stateName);
 
     int page = (int) Math.ceil((double) stateId / KeyboardService.STATES_PER_PAGE);
 
