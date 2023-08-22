@@ -1,9 +1,15 @@
-package com.kozarenko.bot.model;
+package com.kozarenko.bot.model.jpa;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+
 
 @Entity
-@Table(name = "subscription")
+@Table(name = "subscriptions")
 public class Subscription {
 
   @Id
@@ -17,7 +23,8 @@ public class Subscription {
   @Column(name = "state_id")
   private Integer stateId;
 
-  public Subscription() {}
+  public Subscription() {
+  }
 
   public Subscription(Long chatId, Integer stateId) {
     this.chatId = chatId;

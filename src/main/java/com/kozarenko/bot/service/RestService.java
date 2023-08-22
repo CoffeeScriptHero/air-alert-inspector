@@ -22,13 +22,15 @@ public class RestService {
 
   private static final String STATES = "/api/states";
 
+  private final StateMapper stateMapper;
   private final RestTemplate restTemplate;
 
   @Value("${api.key}")
   private String apiKey;
 
-  public RestService(RestTemplateBuilder restTemplateBuilder) {
+  public RestService(RestTemplateBuilder restTemplateBuilder, StateMapper stateMapper) {
     this.restTemplate = restTemplateBuilder.build();
+    this.stateMapper = stateMapper;
   }
 
   private RequestEntity<Void> createRequestEntity(String path) throws URISyntaxException {
@@ -41,8 +43,6 @@ public class RestService {
   }
 
   public List<State> getStates() throws URISyntaxException {
-    StateMapper stateMapper = new StateMapper();
-
     ResponseEntity<String> response =
         restTemplate.exchange(createRequestEntity(STATES), String.class);
 

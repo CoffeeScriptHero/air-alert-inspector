@@ -1,10 +1,20 @@
 package com.kozarenko.bot.service;
 
-import com.kozarenko.bot.component.StateDataProvider;
+import com.kozarenko.bot.provider.StateDataProvider;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 
-import static com.kozarenko.bot.util.Constants.*;
+import static com.kozarenko.bot.util.Constants.CALLBACK_SUBSCRIBE_ALL;
+import static com.kozarenko.bot.util.Constants.CALLBACK_UNSUBSCRIBE_ALL;
+import static com.kozarenko.bot.util.Constants.CALLBACK_STATE_PREFIX;
+import static com.kozarenko.bot.util.Constants.CALLBACK_MAP;
+import static com.kozarenko.bot.util.Constants.CALLBACK_MENU;
+import static com.kozarenko.bot.util.Constants.CALLBACK_HELP;
+import static com.kozarenko.bot.util.Constants.CALLBACK_STATES_PAGE_ONE;
+import static com.kozarenko.bot.util.Constants.CALLBACK_STATES_PAGE_TWO;
+import static com.kozarenko.bot.util.Constants.CALLBACK_STATES_PAGE_THREE;
+import static com.kozarenko.bot.util.Constants.CALLBACK_STATES_PAGE_FOUR;
+
 
 @Service
 public class CallbackService {

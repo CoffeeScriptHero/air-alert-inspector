@@ -1,6 +1,5 @@
 package com.kozarenko.bot.service;
 
-import com.kozarenko.bot.model.Subscription;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -16,19 +15,16 @@ public class UpdateService {
   private static final String COMMAND_MENU = "/menu";
   private static final String COMMAND_HELP = "/help";
 
-  private final SSEService sseService;
   private final SubscriptionService subscriptionService;
   private final SenderService senderService;
   private final CallbackService callbackService;
 
   public UpdateService(SenderService senderService,
                        SubscriptionService subscriptionService,
-                       CallbackService callbackService,
-                       SSEService sseService) {
+                       CallbackService callbackService) {
     this.senderService = senderService;
     this.subscriptionService = subscriptionService;
     this.callbackService = callbackService;
-    this.sseService = sseService;
   }
 
   public void handleUpdate(Update update, long botId) {
@@ -37,9 +33,7 @@ public class UpdateService {
       Message message = update.getMessage();
 
       if (botAddedToGroup(message, botId)) {
-        generateSubscriptions(message.getChat().getId());
-        senderService.sendStartMessage(message.getChat());
-        senderService.sendMenu(message.getChat().getId());
+        onNewUser(message.getChat());
         return;
       }
 
@@ -47,14 +41,7 @@ public class UpdateService {
         Chat chat = message.getChat();
 
         switch (message.getText()) {
-          case COMMAND_START -> {
-            generateSubscriptions(chat.getId());
-            senderService.sendStartMessage(chat);
-            senderService.sendMenu(chat.getId());
-            sseService.connectForUser(
-                update.getMessage().getFrom().getId(), subscriptionService.retrieveStateIdsForChat(chat.getId())
-            );
-          }
+          case COMMAND_START -> onNewUser(chat);
           case COMMAND_MENU -> senderService.sendMenu(chat.getId());
           case COMMAND_HELP -> senderService.sendHelpMessage(chat.getId());
         }
@@ -68,6 +55,12 @@ public class UpdateService {
     if (!subscriptionService.existsByChatId(chatId)) {
       subscriptionService.subscribeToAllStates(chatId);
     }
+  }
+
+  private void onNewUser(Chat chat) {
+    generateSubscriptions(chat.getId());
+    senderService.sendStartMessage(chat);
+    senderService.sendMenu(chat.getId());
   }
 
   private boolean botAddedToGroup(Message message, long botId) {

@@ -1,6 +1,6 @@
 package com.kozarenko.bot.repository;
 
-import com.kozarenko.bot.model.Subscription;
+import com.kozarenko.bot.model.jpa.Subscription;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +15,8 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
   boolean existsByChatIdAndStateId(Long chatId, Integer stateId);
 
   List<Subscription> getSubscriptionsByChatId(Long chatId);
+
+  List<Subscription> getSubscriptionsByStateId(Integer stateId);
 
   @Transactional
   void deleteAllByChatId(Long chatId);

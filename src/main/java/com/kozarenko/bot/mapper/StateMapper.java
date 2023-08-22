@@ -1,21 +1,21 @@
 package com.kozarenko.bot.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kozarenko.bot.dto.StateDto;
+import com.kozarenko.bot.dto.StatesDto;
 import com.kozarenko.bot.model.State;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
-public class StateMapper {
-
-  private final ObjectMapper objectMapper =
-      new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+@Component
+public class StateMapper extends Mapper {
 
   public List<State> statesFromJson(String json) throws JsonProcessingException {
-    Map<String, Object> jsonMap = objectMapper.readValue(json, new TypeReference<>() {});
-    return objectMapper.convertValue(jsonMap.get("states"), new TypeReference<>() {});
+    return getObjectMapper().readValue(json, StatesDto.class).getStates();
+  }
+
+  public State stateFromJson(String json) throws JsonProcessingException {
+    return getObjectMapper().readValue(json, StateDto.class).getState();
   }
 }

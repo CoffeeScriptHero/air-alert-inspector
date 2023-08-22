@@ -1,4 +1,4 @@
-package com.kozarenko.bot.component;
+package com.kozarenko.bot.provider;
 
 import com.kozarenko.bot.model.State;
 import com.kozarenko.bot.service.RestService;

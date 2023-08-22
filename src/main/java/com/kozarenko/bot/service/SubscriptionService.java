@@ -1,7 +1,7 @@
 package com.kozarenko.bot.service;
 
-import com.kozarenko.bot.component.StateDataProvider;
-import com.kozarenko.bot.model.Subscription;
+import com.kozarenko.bot.provider.StateDataProvider;
+import com.kozarenko.bot.model.jpa.Subscription;
 import com.kozarenko.bot.repository.SubscriptionRepository;
 import org.springframework.stereotype.Service;
 
@@ -63,5 +63,12 @@ public class SubscriptionService {
     }
     saveSubscription(chatId, stateId);
     return true;
+  }
+
+  public List<Long> getChatsSubscribedToState(Integer stateId) {
+    return subscriptionRepository.getSubscriptionsByStateId(stateId)
+        .stream()
+        .map(Subscription::getChatId)
+        .toList();
   }
 }
