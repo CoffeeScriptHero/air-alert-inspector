@@ -1,10 +1,22 @@
 plugins {
 	id 'java'
+	id 'application'
 	id 'org.springframework.boot' version '3.1.1'
 	id 'io.spring.dependency-management' version '1.1.0'
-
+	id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
+//jar {
+//	manifest {
+//		attributes "Main-Class": "com.kozarenko.bot.TelegramBotApplication"
+//	}
+//
+//	from {
+//		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+//	}
+//}
+
+mainClassName = 'com.kozarenko.bot.TelegramBotApplication'
 group = 'com.kozarenko.bot'
 version = '0.0.1-SNAPSHOT'
 
@@ -17,17 +29,18 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation 'org.springframework.boot:spring-boot-starter-web:3.1.1'
-	implementation 'com.github.pengrad:java-telegram-bot-api:6.7.0'
-	compileOnly 'org.projectlombok:lombok:1.18.28'
-	annotationProcessor 'org.projectlombok:lombok:1.18.28'
-
-	testCompileOnly 'org.projectlombok:lombok:1.18.28'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.telegram:telegrambots-spring-boot-starter:6.7.0'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.telegram:telegrambots:6.7.0'
+	implementation 'org.postgresql:postgresql:42.6.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
