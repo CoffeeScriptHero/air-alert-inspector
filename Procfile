@@ -1,1 +1,0 @@
-worker: ./gradlew bootRun
