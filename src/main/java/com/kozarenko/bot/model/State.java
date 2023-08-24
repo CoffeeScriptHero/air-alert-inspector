@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import static com.kozarenko.bot.util.Constants.UKRAINE_ZONE_ID;
+
 public class State {
 
   private static final String ALERT_TRUE = "\uD83D\uDD34 Повітряна тривога в ";
@@ -81,7 +83,7 @@ public class State {
   }
 
   private String getAlertDateTimeMessage() {
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss, dd-MM-yyyy");
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss, dd-MM-yyyy").withZone(UKRAINE_ZONE_ID);
     return "Час: " + changed.format(dtf);
   }
 

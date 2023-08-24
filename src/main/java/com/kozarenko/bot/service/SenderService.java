@@ -15,18 +15,16 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static com.kozarenko.bot.util.Constants.API_MAP_URL;
 import static com.kozarenko.bot.util.Constants.PARSE_MODE_MARKDOWN;
+import static com.kozarenko.bot.util.Constants.UKRAINE_ZONE_ID;
 
 @Service
 public class SenderService extends DefaultAbsSender {
 
-  private static final String UKRAINE_ZONE_ID = "Europe/Kiev";
   private static final String GREETINGS_GROUP = "Вітаю всіх учасників групи ";
   private static final String GREETINGS_PERSONAL = "Вітаю, ";
   private static final String DEFAULT_MENU_TEXT = "Оберіть будь-яку функцію:";
@@ -158,7 +156,7 @@ public class SenderService extends DefaultAbsSender {
               .photo(new InputFile(API_MAP_URL + "?t=" + System.currentTimeMillis()))
               .chatId(chatId)
               .caption(String.format(MAP_STATUS_TEXT,
-                  ZonedDateTime.now(ZoneId.of(UKRAINE_ZONE_ID)).toLocalTime().format(dtf)))
+                  ZonedDateTime.now(UKRAINE_ZONE_ID).toLocalTime().format(dtf)))
               .parseMode(PARSE_MODE_MARKDOWN)
               .replyMarkup(keyboardService.getKeyboardGoBack())
               .build()

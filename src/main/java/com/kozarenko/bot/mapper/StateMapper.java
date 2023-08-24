@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
-public class StateMapper extends Mapper {
+  @Component
+  public class StateMapper extends Mapper {
 
-  public List<State> statesFromJson(String json) throws JsonProcessingException {
-    return getObjectMapper().readValue(json, StatesDto.class).getStates();
-  }
+    public List<State> statesFromJson(String json) throws JsonProcessingException {
+      return getObjectMapper().readValue(json, StatesDto.class).getStates();
+    }
 
-  public State stateFromJson(String json) throws JsonProcessingException {
-    return getObjectMapper().readValue(json, StateDto.class).getState();
+    public State stateFromJson(String json) throws JsonProcessingException {
+      return getObjectMapper().readValue(json, StateDto.class).getState();
+    }
   }
-}

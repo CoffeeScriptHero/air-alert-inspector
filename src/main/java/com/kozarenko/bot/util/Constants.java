@@ -1,5 +1,7 @@
 package com.kozarenko.bot.util;
 
+import java.time.ZoneId;
+
 public class Constants {
     public static final String PARSE_MODE_MARKDOWN = "Markdown";
 
@@ -17,4 +19,6 @@ public class Constants {
     public static final String CALLBACK_STATES_PAGE_TWO = "states-page-2";
     public static final String CALLBACK_STATES_PAGE_THREE = "states-page-3";
     public static final String CALLBACK_STATES_PAGE_FOUR = "states-page-4";
+
+    public static final ZoneId UKRAINE_ZONE_ID = ZoneId.of("Europe/Kiev");
 }

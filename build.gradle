@@ -6,16 +6,6 @@ plugins {
 	id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
-//jar {
-//	manifest {
-//		attributes "Main-Class": "com.kozarenko.bot.TelegramBotApplication"
-//	}
-//
-//	from {
-//		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-//	}
-//}
-
 mainClassName = 'com.kozarenko.bot.TelegramBotApplication'
 group = 'com.kozarenko.bot'
 version = '0.0.1-SNAPSHOT'
@@ -41,6 +31,3 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-
-task stage(dependsOn: ['build', 'clean'])
-build.mustRunAfter clean
