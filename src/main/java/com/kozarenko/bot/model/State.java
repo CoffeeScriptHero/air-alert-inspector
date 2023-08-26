@@ -92,12 +92,12 @@ public class State {
   }
 
   private String getHashtagName() {
-    String cityPrefix = "м.";
-    String cityDelimiter = ".";
+    String cityPrefix = "м. ";
+    String cityDelimiter = " ";
     String stateDelimiter = " ";
 
     if (name.startsWith(cityPrefix)) {
-      return "#м_" + name.substring(name.indexOf(cityDelimiter + 1));
+      return "#м_" + name.substring(name.indexOf(cityDelimiter) + 1);
     }
 
     int delimiterIndex = name.indexOf(stateDelimiter);
